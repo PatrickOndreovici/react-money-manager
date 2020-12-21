@@ -42,8 +42,8 @@
 .item{
   user-select: none;
   border-radius: 16px;
-  width: 170px;
-  height: 100px;
+  width: 180px;
+  height: 110px;
   display: flex;
   justify-content: center;
   align-items: center;
