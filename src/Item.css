@@ -1,0 +1,18 @@
+.Item h4{
+    display: inline-block;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.nameOfItem{
+    margin-right: 30px;
+    margin-left: 10px;
+}
+
+.costOfItem{
+    margin-right: 4px;
+}
+.Item{
+    padding: 7px;
+}
+

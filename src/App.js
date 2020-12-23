@@ -13,16 +13,16 @@ function App() {
     if (localStorage.length === 0){
       const data = {
         income: {
-          eur: 0,
-          lei: 0
+          EUR: 0,
+          RON: 0
         },
         expense: {
-          eur: 0,
-          lei: 0
+          EUR: 0,
+          RON: 0
         },
         deposit: {
-          eur: 0,
-          lei: 0
+          EUR: 0,
+          RON: 0
         }
       }
       setLocalStorageData(data);
@@ -33,24 +33,16 @@ function App() {
       setLocalStorageData(JSON.parse(data));
     }
   }, []);
-
-  const addMoney = (type, currency, money) => {
-    if (isNaN(money)){
-      return;
-    }
-    const data = {...localStorageData};
-    data[type][currency] += Number(money);
-    setLocalStorageData(data);
-    localStorage.setItem('data', JSON.stringify(data));
-  }
-
+  useEffect(() => {
+    localStorage.setItem('data', JSON.stringify(localStorageData));
+  }, [localStorageData]);
   return (
     <Router>
       <div className="App">
         <Nav />
         <Switch>
           <Route path="/" exact render={props => (
-              <Dashboard {...props} localStorageData = {localStorageData} addMoney = {addMoney} />
+              <Dashboard {...props} localStorageData = {localStorageData} setLocalStorageData = {setLocalStorageData}/>
             )} />
           <Route path="/graph" component={Graph} />
         </Switch>
