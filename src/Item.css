@@ -6,7 +6,7 @@
 
 .nameOfItem{
     margin-right: 30px;
-    margin-left: 10px;
+    margin-left: 20px;
 }
 
 .costOfItem{
@@ -14,5 +14,15 @@
 }
 .Item{
     padding: 7px;
+    color:#ffffff;
+    font-weight:bold;
+}
+.deleteButton{
+    display: inline;
+}
+
+.deleteButton:hover{
+    cursor: pointer;
+    color: black;
 }
 

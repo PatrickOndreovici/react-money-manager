@@ -9,6 +9,7 @@ function Dashboard(props) {
   const types = ["income", "expense", "deposit"];
   const [type, setType] = useState(0);
   const [currency, setCurrency] = useState("EUR");
+  const [dashboardRates, setDashboardRates] = useState({});
   const [addItems, setAddItems] = useState([]);
   const [totalCost, setTotalCost] = useState({
     EUR: 0,
@@ -20,14 +21,19 @@ function Dashboard(props) {
   useEffect(async () => {
     const data = await exchangeRatesApi("EUR");
     setRates(data);
+    const data2 = await exchangeRatesApi("EUR");
+    setDashboardRates(data2);
   }, []);
 
   useEffect(async () => {
     const data = await exchangeRatesApi(totalCostCurrency);
     setRates(data);
-  }, [totalCostCurrency])
+  }, [totalCostCurrency]);
 
-
+  useEffect(async () => {
+    const data = await exchangeRatesApi(currency);
+    setDashboardRates(data);
+  }, [currency]);
   const incomeSVG = (
           <svg width="70" height="22" viewBox="0 0 70 22" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M2 12.4764C28.7826 40.5567 42.6522 -21.5155 68 12.4764" stroke="#4840B5" strokeWidth="4"/>
@@ -93,7 +99,6 @@ function Dashboard(props) {
     document.getElementsByClassName("costOfItemInput")[0].value = "";
   }
   const displayTotalCost = () => {
-    console.log(rates);
     let cost = 0;
     for (let i = 0; i < addItems.length; ++i){
       if (addItems[i][2] == totalCostCurrency){
@@ -105,12 +110,26 @@ function Dashboard(props) {
     }
     return cost.toFixed(2);
   }
+
+  const displayType = (type) => {
+    let cost = 0;
+    if (currency === "EUR"){
+      cost = Number(props.localStorageData[type][currency]);
+      cost += Number(props.localStorageData[type]["RON"]) / Number(dashboardRates["RON"]);
+    }
+    else{
+      cost = Number(props.localStorageData[type][currency]);
+      cost += Number(props.localStorageData[type]["EUR"]) / Number(dashboardRates["EUR"]);
+    }
+    return cost.toFixed(2);
+  }
+
   const displayItems = () => {
     const arr = [];
     for (let i = 0; i < addItems.length; ++i){
-        let color = "#C2DFFF";
+        let color = "#4398c9";
         if (i % 2 === 1){
-          color = "#C0C0C0";
+          color = "#437dd4";
         }
         arr.push(<Item index = {i} deleteItem = {deleteItem} color = {color} key = {i} nameOfItem = {addItems[i][0]} costOfItem = {addItems[i][1]} currencyOfItem = {addItems[i][2]}></Item>)
     }
@@ -124,6 +143,31 @@ function Dashboard(props) {
     const data = {...props.localStorageData};
     for (let i = 0; i < addItems.length; ++i){
       data[types[type]][addItems[i][2]] += Number(addItems[i][1]);
+    }
+    let today = new Date();
+    let yesterday = new Date(today)
+    yesterday.setDate(yesterday.getDate() - 2);
+    yesterday = yesterday.toLocaleDateString();
+    today = today.toLocaleDateString();
+    console.log(yesterday);
+    if (localStorage.getItem("history") === null){
+      let data = {
+        income: {},
+        expense: {},
+        deposit: {}
+      };
+      data[types[type]][today] = [addItems];
+      localStorage.setItem('history', JSON.stringify(data));
+    }
+    else{
+      let data = localStorage.getItem('history');
+      let parsedData = JSON.parse(data);
+      if (parsedData[types[type]][today] === undefined){
+        parsedData[types[type]][today] = [];
+      }
+      parsedData[types[type]][today].push(addItems);
+      console.log(parsedData);
+      localStorage.setItem('history', JSON.stringify(parsedData));
     }
     setAddItems([]);
     props.setLocalStorageData(data);
@@ -142,7 +186,12 @@ function Dashboard(props) {
     <div className="dashboard">
 
       <div>
-            <h1>Dashboard</h1>
+            <div style = {{textAlign: "center", marginTop: "70px", marginBottom: "20px"}}>
+              <select onChange = {changeCurrency}>
+                <option>EUR</option>
+                <option>RON</option>
+              </select>
+        </div>
             <div className = "moneyData">
 
               <div className = "item" style = {activeItem}>
@@ -153,7 +202,7 @@ function Dashboard(props) {
 
                 <div>
                   <h3>Income</h3>
-                  <p> {props.localStorageData === null ? 0 : props.localStorageData.income[currency].toLocaleString()} {currency}</p>
+                  <p> {props.localStorageData === null ? 0 : displayType("income").toLocaleString()} {currency}</p>
                 </div>
 
               </div>
@@ -166,7 +215,7 @@ function Dashboard(props) {
                 
                 <div>
                   <h3>Expense</h3>
-                  <p>{props.localStorageData === null ? 0 : props.localStorageData.expense[currency].toLocaleString()} {currency}</p>
+                  <p>{props.localStorageData === null ? 0 : displayType("expense").toLocaleString()} {currency}</p>
                 </div>
 
               </div>
@@ -179,7 +228,7 @@ function Dashboard(props) {
                 
                 <div>
                   <h3>Deposit</h3>
-                  <p>{props.localStorageData === null ? 0 : props.localStorageData.deposit[currency].toLocaleString()} {currency}</p>
+                  <p>{props.localStorageData === null ? 0 : displayType("deposit").toLocaleString()} {currency}</p>
                 </div>
 
               </div>
@@ -242,7 +291,7 @@ function Dashboard(props) {
                   {addItems.length > 0 ? <hr></hr> : null}
                   {addItems.length > 0 ? <h3 style = {{display: "inline", marginRight: "10px"}}>Total cost: {displayTotalCost()} {totalCostCurrency}</h3> : null}
                   {addItems.length > 0 ? (<select onChange = {changeTotalCostCurrency}><option>EUR</option> <option>RON</option></select>) : null}
-                  {addItems.length > 0 ? <button onClick = {addTheTransaction} style = {{display: "block"}}>  Add the transaction</button> : null}
+                  {addItems.length > 0 ? <button className = "addTheTransactionButton" onClick = {addTheTransaction} style = {{display: "block"}}>  Add the transaction</button> : null}
             </div>
       </div>
     </div>

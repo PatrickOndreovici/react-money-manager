@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
 html{
-  background-color:#C2DFFF;
+  background-color:#FAFAFA;
 }
 .App {
   display: grid;
@@ -29,4 +29,5 @@ select{
       padding: 10px;
       border-radius: 6px;
       font-weight: 700;
+      width: 100px;
 }
