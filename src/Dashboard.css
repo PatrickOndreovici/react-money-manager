@@ -145,3 +145,37 @@
     position:relative;
     top:1px;
   }
+
+  @media only screen and (max-width: 1540px) {
+    .item{
+      width: 150px;
+      height: 120px;
+    }
+    .moneyData p {
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .icon{
+      width: 58px;
+      height: 30px;
+      border-radius: 10px;
+      margin-right: 20px;
+  }
+    svg{
+      width: 58px;
+      height: 22px;
+    }
+    .dashboard h3 {
+      font-size: 15px;
+    }
+    .dashboard h1 {
+      font-size: 25px;
+    }
+    .nameOfItemInput{
+      width: 180px;
+    }
+    .costOfItemInput{
+      width: 90px;
+    }
+  }
+

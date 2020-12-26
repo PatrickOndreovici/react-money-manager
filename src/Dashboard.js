@@ -145,11 +145,7 @@ function Dashboard(props) {
       data[types[type]][addItems[i][2]] += Number(addItems[i][1]);
     }
     let today = new Date();
-    let yesterday = new Date(today)
-    yesterday.setDate(yesterday.getDate() - 2);
-    yesterday = yesterday.toLocaleDateString();
     today = today.toLocaleDateString();
-    console.log(yesterday);
     if (localStorage.getItem("history") === null){
       let data = {
         income: {},
