@@ -1,11 +1,15 @@
 import React, {useEffect, useState} from 'react';
-import './Graph.css';
 import {Line} from 'react-chartjs-2';
 import exchangeRatesApi from './exchangeRatesApi';
+import currencies from './currencies';
+import './Graph.css';
 
 function Graph() {
+  console.log(currencies);
+  // current currency used to display data on graph
   const [currency, setCurrency] = useState("EUR");
   
+  // graph data for 3 days
   const [data, setData] = useState({
     labels: ['other day', 'yesterday', 'today'],
     datasets: [
@@ -32,22 +36,25 @@ function Graph() {
       }
     ]
   });
-  useEffect(async () => {
-    const dataCurrency = await exchangeRatesApi(currency);
-    if (localStorage.length !== 0){
-      modifyData(dataCurrency);
+
+
+
+  useEffect(() => {
+    const changeToCurrentCurrency = async () => {
+      const dataCurrency = await exchangeRatesApi(currency);
+      if (localStorage.length !== 0){
+        modifyData(dataCurrency);
+      }
     }
-  }, []);
-  useEffect(async () => {
-    const dataCurrency = await exchangeRatesApi(currency);
-    if (localStorage.length !== 0){
-      modifyData(dataCurrency);
-    }
+    changeToCurrentCurrency();
   }, [currency]);
+
+
 
   const changeCurrency = (event) => {
     setCurrency(event.target.value);
   }
+
   const getTotalProfit = (parsedHistory, type, date, money, aux) => {
     if (parsedHistory[type][date] !== undefined){
       for (let i = 0; i < parsedHistory[type][date].length; ++i){
@@ -63,17 +70,23 @@ function Graph() {
       }
     }
   }
+
+
+
   const getCost = (money, rates) => {
     let cost = 0;
     if (money["EUR"] === undefined) money["EUR"] = 0;
     if (money["RON"] === undefined) money["RON"] = 0;
-    if (currency === "EUR"){
-      cost += Number(money["EUR"]);
-      cost += Number(money["RON"]) / Number(rates["RON"]);
-    }
-    else{
-      cost = Number(money["RON"]);
-      cost += Number(money["EUR"]) / Number(rates["EUR"]);
+    for (let i = 0; i < currencies.length; ++i){
+      if (money[currencies[i]] === undefined){
+        money[currencies[i]] = 0;
+      }
+      if (currency === currencies[i]){
+        cost += Number(money[currencies[i]]);
+      }
+      else{
+        cost += Number(money[currencies[i]]) / Number(rates[currencies[i]]);
+      }
     }
     return cost.toFixed(2);
   }
@@ -85,6 +98,7 @@ function Graph() {
     const auxData = {...data};
     auxData.datasets[0].data = [];
     let parsedHistory = JSON.parse(history);
+    console.log(parsedHistory);
     let today = new Date();
     let yesterday = new Date(today)
     yesterday.setDate(yesterday.getDate() - 1);
@@ -112,15 +126,20 @@ function Graph() {
     total = getCost(money, rates);
     auxData.datasets[0].data.push(total);
     setData(auxData);
-    console.log(auxData);
   }
-  console.log(data);
+
+  const displayCurrencyOptions = () => {
+    const arrayOfOptions = [];
+    for (let i = 0; i < currencies.length; ++i){
+      arrayOfOptions.push(<option key = {i}>{currencies[i]}</option>);
+    }
+    return arrayOfOptions;
+  }
+
   return (
     <div className="graph">
-      <h1>graph</h1>
-      <select style = {{margin: "auto"}} onChange = {changeCurrency}>
-        <option>EUR</option>
-        <option>RON</option>
+      <select style = {{margin: "auto", marginTop: "40px"}} onChange = {changeCurrency}>
+        {displayCurrencyOptions()}
       </select>
       <div style={{ position: "relative", margin: "auto", width: "70vw", height: "500px"}}>
        <Line data={data} options={{

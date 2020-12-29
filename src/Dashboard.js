@@ -4,6 +4,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faTrashAlt} from '@fortawesome/free-solid-svg-icons';
 import Item from './Item';
 import exchangeRatesApi from './exchangeRatesApi';
+import currencies from './currencies';
+
 
 function Dashboard(props) {
   const types = ["income", "expense", "deposit"];
