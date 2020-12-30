@@ -13,28 +13,24 @@ function Dashboard(props) {
   const [currency, setCurrency] = useState("EUR");
   const [dashboardRates, setDashboardRates] = useState({});
   const [addItems, setAddItems] = useState([]);
-  const [totalCost, setTotalCost] = useState({
-    EUR: 0,
-    RON: 0
-  });
+  const [totalCost, setTotalCost] = useState({ });
   const [rates, setRates] = useState({});
   const [totalCostCurrency, setTotalCostCurrency] = useState("EUR");
 
   useEffect(async () => {
-    const data = await exchangeRatesApi("EUR");
-    setRates(data);
-    const data2 = await exchangeRatesApi("EUR");
-    setDashboardRates(data2);
-  }, []);
-
-  useEffect(async () => {
-    const data = await exchangeRatesApi(totalCostCurrency);
-    setRates(data);
+    const changeToCurrentCurrency = async () => {
+      const data = await exchangeRatesApi(totalCostCurrency);
+      setRates(data);
+    }
+    changeToCurrentCurrency();
   }, [totalCostCurrency]);
 
-  useEffect(async () => {
-    const data = await exchangeRatesApi(currency);
-    setDashboardRates(data);
+  useEffect(() => {
+    const changeToCurrentCurrency = async () => {
+      const data = await exchangeRatesApi(currency);
+      setDashboardRates(data);
+    }
+    changeToCurrentCurrency();
   }, [currency]);
   const incomeSVG = (
           <svg width="70" height="22" viewBox="0 0 70 22" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -84,6 +80,8 @@ function Dashboard(props) {
   }
 
 
+
+
   const addItem = () => {
     let nameOfItem = document.getElementsByClassName("nameOfItemInput")[0].value;
     let costOfItem = document.getElementsByClassName("costOfItemInput")[0].value;
@@ -115,13 +113,16 @@ function Dashboard(props) {
 
   const displayType = (type) => {
     let cost = 0;
-    if (currency === "EUR"){
-      cost = Number(props.localStorageData[type][currency]);
-      cost += Number(props.localStorageData[type]["RON"]) / Number(dashboardRates["RON"]);
-    }
-    else{
-      cost = Number(props.localStorageData[type][currency]);
-      cost += Number(props.localStorageData[type]["EUR"]) / Number(dashboardRates["EUR"]);
+    for (let i = 0; i < currencies.length; ++i){
+      if (props.localStorageData[type][currencies[i]] === undefined){
+        continue;
+      }
+      if (currency === currencies[i]){
+        cost += Number(props.localStorageData[type][currencies[i]]);
+      }
+      else{
+        cost += Number(props.localStorageData[type][currencies[i]]) / Number(dashboardRates[currencies[i]]);
+      }
     }
     return cost.toFixed(2);
   }
@@ -142,9 +143,12 @@ function Dashboard(props) {
     setTotalCostCurrency(curr);
   }
   const addTheTransaction = () => {
-    const data = {...props.localStorageData};
+    const storageData = {...props.localStorageData};
     for (let i = 0; i < addItems.length; ++i){
-      data[types[type]][addItems[i][2]] += Number(addItems[i][1]);
+      if (storageData[types[type]][addItems[i][2]] === undefined){
+        storageData[types[type]][addItems[i][2]] = 0;
+      }
+      storageData[types[type]][addItems[i][2]] += Number(addItems[i][1]);
     }
     let today = new Date();
     today = today.toLocaleDateString();
@@ -164,11 +168,10 @@ function Dashboard(props) {
         parsedData[types[type]][today] = [];
       }
       parsedData[types[type]][today].push(addItems);
-      console.log(parsedData);
       localStorage.setItem('history', JSON.stringify(parsedData));
     }
     setAddItems([]);
-    props.setLocalStorageData(data);
+    props.setLocalStorageData(storageData);
   }
 
   const deleteItem = (index) => {
@@ -180,14 +183,21 @@ function Dashboard(props) {
     setAddItems(items);
   }
 
+  const displayCurrencyOptions = () => {
+    const arrayOfOptions = [];
+    for (let i = 0; i < currencies.length; ++i){
+      arrayOfOptions.push(<option key = {i}>{currencies[i]}</option>);
+    }
+    return arrayOfOptions;
+  }
+
   return (
     <div className="dashboard">
 
       <div>
             <div style = {{textAlign: "center", marginTop: "70px", marginBottom: "20px"}}>
               <select onChange = {changeCurrency}>
-                <option>EUR</option>
-                <option>RON</option>
+                {displayCurrencyOptions()}
               </select>
         </div>
             <div className = "moneyData">
@@ -280,15 +290,14 @@ function Dashboard(props) {
                   <input className = "nameOfItemInput" placeholder = "name of item"></input>
                   <input className = "costOfItemInput" placeholder = "cost of item"></input>
                   <select className = "currencyOfItemInput">
-                    <option>EUR</option>
-                    <option>RON</option>
+                    {displayCurrencyOptions()}
                   </select>
                 </div>
                 <button className = "addItemButton" onClick = {addItem}><FontAwesomeIcon icon={faPlus}/> Add</button>
                   {displayItems()}
                   {addItems.length > 0 ? <hr></hr> : null}
                   {addItems.length > 0 ? <h3 style = {{display: "inline", marginRight: "10px"}}>Total cost: {displayTotalCost()} {totalCostCurrency}</h3> : null}
-                  {addItems.length > 0 ? (<select onChange = {changeTotalCostCurrency}><option>EUR</option> <option>RON</option></select>) : null}
+                  {addItems.length > 0 ? (<select onChange = {changeTotalCostCurrency}>{displayCurrencyOptions()}</select>) : null}
                   {addItems.length > 0 ? <button className = "addTheTransactionButton" onClick = {addTheTransaction} style = {{display: "block"}}>  Add the transaction</button> : null}
             </div>
       </div>

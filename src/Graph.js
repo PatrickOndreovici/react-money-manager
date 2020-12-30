@@ -75,8 +75,6 @@ function Graph() {
 
   const getCost = (money, rates) => {
     let cost = 0;
-    if (money["EUR"] === undefined) money["EUR"] = 0;
-    if (money["RON"] === undefined) money["RON"] = 0;
     for (let i = 0; i < currencies.length; ++i){
       if (money[currencies[i]] === undefined){
         money[currencies[i]] = 0;
