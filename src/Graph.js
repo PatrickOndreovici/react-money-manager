@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Line} from 'react-chartjs-2';
+import {Line, Doughnut} from 'react-chartjs-2';
 import exchangeRatesApi from './exchangeRatesApi';
 import currencies from './currencies';
 import './Graph.css';
@@ -57,8 +57,8 @@ function Graph() {
 
   const getTotalProfit = (parsedHistory, type, date, money, aux) => {
     if (parsedHistory[type][date] !== undefined){
-      for (let i = 0; i < parsedHistory[type][date].length; ++i){
-        const v = parsedHistory[type][date][i];
+      for (let i = 0; i < parsedHistory[type][date]["items"].length; ++i){
+        const v = parsedHistory[type][date]["items"][i];
         for (let j = 0; j < v.length; ++j){
           let amount = Number(v[j][1]);
           let curr = v[j][2];
@@ -96,7 +96,6 @@ function Graph() {
     const auxData = {...data};
     auxData.datasets[0].data = [];
     let parsedHistory = JSON.parse(history);
-    console.log(parsedHistory);
     let today = new Date();
     let yesterday = new Date(today)
     yesterday.setDate(yesterday.getDate() - 1);
@@ -144,6 +143,26 @@ function Graph() {
             maintainAspectRatio : false
           }}/>
       </div>
+      <Doughnut data={{
+	labels: [
+		'Red',
+		'Green',
+		'Yellow'
+	],
+	datasets: [{
+		data: [300, 50, 100],
+		backgroundColor: [
+		'#FF6384',
+		'#36A2EB',
+		'#FFCE56'
+		],
+		hoverBackgroundColor: [
+		'#FF6384',
+		'#36A2EB',
+		'#FFCE56'
+		]
+	}]
+}} />
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { faPlus, faTrashAlt} from '@fortawesome/free-solid-svg-icons';
 import Item from './Item';
 import exchangeRatesApi from './exchangeRatesApi';
 import currencies from './currencies';
+import Categories from './Categories';
 
 
 function Dashboard(props) {
@@ -16,6 +17,8 @@ function Dashboard(props) {
   const [totalCost, setTotalCost] = useState({ });
   const [rates, setRates] = useState({});
   const [totalCostCurrency, setTotalCostCurrency] = useState("EUR");
+  const categories = ["food", "clothes", "social life", "self development", "health", "other"];
+  const [currentCategory, setCurrentCategory] = useState(-1);
 
   useEffect(async () => {
     const changeToCurrentCurrency = async () => {
@@ -158,16 +161,26 @@ function Dashboard(props) {
         expense: {},
         deposit: {}
       };
-      data[types[type]][today] = [addItems];
+      if (data[types[type]][today] === undefined){
+        data[types[type]][today] = {
+          items: [addItems],
+          categories: [categories[currentCategory]]
+        }
+      }
       localStorage.setItem('history', JSON.stringify(data));
     }
     else{
       let data = localStorage.getItem('history');
       let parsedData = JSON.parse(data);
       if (parsedData[types[type]][today] === undefined){
-        parsedData[types[type]][today] = [];
+        parsedData[types[type]][today] = {
+          items: [],
+          categories: []
+        }
       }
-      parsedData[types[type]][today].push(addItems);
+      parsedData[types[type]][today]["items"].push(addItems);
+      parsedData[types[type]][today]["categories"].push(categories[currentCategory]);
+      console.log(parsedData);
       localStorage.setItem('history', JSON.stringify(parsedData));
     }
     setAddItems([]);
@@ -298,6 +311,7 @@ function Dashboard(props) {
                   {addItems.length > 0 ? <hr></hr> : null}
                   {addItems.length > 0 ? <h3 style = {{display: "inline", marginRight: "10px"}}>Total cost: {displayTotalCost()} {totalCostCurrency}</h3> : null}
                   {addItems.length > 0 ? (<select onChange = {changeTotalCostCurrency}>{displayCurrencyOptions()}</select>) : null}
+                  <Categories currentCategory = {currentCategory} setCurrentCategory = {setCurrentCategory}></Categories>
                   {addItems.length > 0 ? <button className = "addTheTransactionButton" onClick = {addTheTransaction} style = {{display: "block"}}>  Add the transaction</button> : null}
             </div>
       </div>

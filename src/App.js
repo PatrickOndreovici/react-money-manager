@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import './App.css';
 import Dashboard from './Dashboard';
 import Graph from './Graph';
+import History from './History';
 import Nav from './Nav';
 import {Switch, Route, useLocation} from 'react-router-dom';
 
@@ -40,7 +41,8 @@ function App() {
   useEffect(() => {
     const route = window.location.pathname;
     if (route === "/") setActiveIndex(0);
-    else if (route == '/graph') setActiveIndex(1);
+    else if (route === '/graph') setActiveIndex(1);
+    else if (route === '/history') setActiveIndex(2);
   }, [location]);
   return (
       <div className="App">
@@ -50,6 +52,7 @@ function App() {
               <Dashboard {...props} localStorageData = {localStorageData} setLocalStorageData = {setLocalStorageData}/>
             )} />
           <Route path="/graph" component={Graph} />
+          <Route path="/history" component={History} />
         </Switch>
       </div>
   );
