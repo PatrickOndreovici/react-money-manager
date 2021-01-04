@@ -2,10 +2,10 @@ import React, {useEffect, useState} from 'react';
 import './Dashboard.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faTrashAlt} from '@fortawesome/free-solid-svg-icons';
-import Item from './Item';
-import exchangeRatesApi from './exchangeRatesApi';
+import exchangeRatesApi from '../exchangeRatesApi';
 import currencies from './currencies';
 import Categories from './Categories';
+import Item from './Item';
 
 
 function Dashboard(props) {
@@ -17,7 +17,7 @@ function Dashboard(props) {
   const [totalCost, setTotalCost] = useState({ });
   const [rates, setRates] = useState({});
   const [totalCostCurrency, setTotalCostCurrency] = useState("EUR");
-  const categories = ["food", "clothes", "social life", "self development", "health", "other"];
+  const categories = ["Food", "Clothes", "Social life", "Self development", "Health", "Other"];
   const [currentCategory, setCurrentCategory] = useState(-1);
 
   useEffect(async () => {

@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import './App.css';
-import Dashboard from './Dashboard';
-import Graph from './Graph';
-import History from './History';
-import Nav from './Nav';
+import Dashboard from './components/Dashboard';
+import Graph from './components/Graph';
+import History from './components/History';
+import Nav from './components/Nav';
 import {Switch, Route, useLocation} from 'react-router-dom';
 
 function App() {

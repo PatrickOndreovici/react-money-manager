@@ -1,11 +1,12 @@
 import React, {useEffect, useState} from 'react';
 import {Line, Doughnut} from 'react-chartjs-2';
-import exchangeRatesApi from './exchangeRatesApi';
+import exchangeRatesApi from '../exchangeRatesApi';
 import currencies from './currencies';
 import './Graph.css';
+import TopCategories from './TopCategories';
+import LineGraph from './LineGraph';
 
 function Graph() {
-  console.log(currencies);
   // current currency used to display data on graph
   const [currency, setCurrency] = useState("EUR");
   
@@ -119,7 +120,6 @@ function Graph() {
     money = {};
     getTotalProfit(parsedHistory, "income", today, money, 1);
     getTotalProfit(parsedHistory, "expense", today, money, -1);
-    console.log(money);
     total = getCost(money, rates);
     auxData.datasets[0].data.push(total);
     setData(auxData);
@@ -143,26 +143,11 @@ function Graph() {
             maintainAspectRatio : false
           }}/>
       </div>
-      <Doughnut data={{
-	labels: [
-		'Red',
-		'Green',
-		'Yellow'
-	],
-	datasets: [{
-		data: [300, 50, 100],
-		backgroundColor: [
-		'#FF6384',
-		'#36A2EB',
-		'#FFCE56'
-		],
-		hoverBackgroundColor: [
-		'#FF6384',
-		'#36A2EB',
-		'#FFCE56'
-		]
-	}]
-}} />
+      <div className = "categories">
+        <TopCategories key = {currency + "1"} currency = {currency} numberOfCategories = {3}></TopCategories>
+        <TopCategories key = {currency + "2"} currency = {currency} numberOfCategories = {5}></TopCategories>
+      </div>
+      <LineGraph numberOfMonths = {1} currency = {currency}></LineGraph>
     </div>
   );
 }

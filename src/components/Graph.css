@@ -6,3 +6,9 @@
     justify-content:  space-around;
     padding-bottom: 6rem;
 }
+
+.categories{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
