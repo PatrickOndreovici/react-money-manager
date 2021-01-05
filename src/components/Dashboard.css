@@ -10,14 +10,17 @@
 .moneyData{
     display: flex;
     justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
     padding: 0 6rem;
   }
   
   .moneyData p {
-    font-size: 18px;
+    font-size: 11px;
     font-weight: 700;
   }
   .item{
+    margin-top: 1rem;
     user-select: none;
     border-radius: 16px;
     width: 220px;
@@ -34,12 +37,16 @@
   }
   
   .icon{
-      width: 70px;
+      width: 60px;
       height: 50px;
       border-radius: 10px;
       margin-right: 20px;
   }
   
+  svg{
+    width: 60px;
+  }
+
   h1{
     margin-top: 70px;
     text-align: center;
@@ -58,7 +65,7 @@
 
 
   .addNewItems{
-      width: 40%;
+      width:70%;
       margin: auto;
       margin-top: 80px;
       background-color: white;
@@ -144,35 +151,5 @@
   .addTheTransactionButton:active {
     position:relative;
     top:1px;
-  }
-
-  @media only screen and (max-width: 1540px) {
-    .item{
-      width: 180px;
-      height: 120px;
-    }
-    .moneyData p {
-      font-size: 13px;
-      font-weight: 700;
-    }
-    .icon{
-      width: 58px;
-      height: 30px;
-      border-radius: 10px;
-      margin-right: 20px;
-  }
-    svg{
-      width: 58px;
-      height: 22px;
-    }
-    .dashboard h3 {
-      font-size: 15px;
-    }
-    .dashboard h1 {
-      font-size: 25px;
-    }
-    .addNewItems{
-      width: 55%;
-    }
   }
 

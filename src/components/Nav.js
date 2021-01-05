@@ -16,20 +16,27 @@ function Nav(props) {
   styles[props.activeIndex] = activeNavStyle;
   return (
     <div className="navBar">
-      <ul>
-          <Link style = {styles[0]} to = "/">
-            <li> <FontAwesomeIcon icon={faHome} /> Dashboard</li>
-          </Link>
-          
-          <Link style = {styles[1]} to = "graph">
-            <li> <FontAwesomeIcon icon={faChartPie} /> Graph</li>
-          </Link>
+      <div className = "hamburger">
+        <div className = "line"></div>
+        <div className = "line"></div>
+        <div className = "line"></div>
+      </div>
+      <div className = "navLinks">
+        <ul>
+            <Link style = {styles[0]} to = "/">
+              <li> <FontAwesomeIcon icon={faHome} /> Dashboard</li>
+            </Link>
+            
+            <Link style = {styles[1]} to = "graph">
+              <li> <FontAwesomeIcon icon={faChartPie} /> Graph</li>
+            </Link>
 
-          <Link style = {styles[2]} to = "history">
-            <li> <FontAwesomeIcon icon={faHistory} /> History</li>
-          </Link>
+            <Link style = {styles[2]} to = "history">
+              <li> <FontAwesomeIcon icon={faHistory} /> History</li>
+            </Link>
 
-      </ul>
+        </ul>
+      </div>
     </div>
   );
 }

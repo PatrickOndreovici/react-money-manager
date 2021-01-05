@@ -4,11 +4,13 @@ import React, {useState, useEffect} from 'react';
 import exchangeRatesApi from '../exchangeRatesApi';
 
 function LineGraph(props) {
+    var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const [avarageProfit, setAvarageProfit] = useState(0);
     const [data, setData] = useState({
-        labels: ['other day', 'yesterday', 'today', '1', '1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1'],
+        labels: [],
         datasets: [
             {
-            label: 'Last 3 days',
+            label: 'line graph',
             fill: true,
             lineTension: 0.1,
             backgroundColor: 'rgba(75,192,192,0.4)',
@@ -26,7 +28,7 @@ function LineGraph(props) {
             pointHoverBorderWidth: 2,
             pointRadius: 1,
             pointHitRadius: 10,
-            data: [0, 0, 0]
+            data: new Array(20).fill(0)
             }
         ]
         }); 
@@ -34,69 +36,75 @@ function LineGraph(props) {
 
     useEffect(() => {
         const modifyData = async (dataCurrency) => {
+            const history = localStorage.getItem('history');
+            const parsedHistory = JSON.parse(history);
+            if (parsedHistory === null){
+                return;
+            }
 
-            if (props.numberOfMonths === 1){
-                const history = localStorage.getItem('history');
-                const parsedHistory = JSON.parse(history);
-                if (parsedHistory === null){
-                    return;
+            const dataAux = {...data};
+            dataAux.labels = [];
+            dataAux.datasets[0].data = [];
+            const getMoney = (items) => {
+                let totalCost = 0;
+                for (let i = 0; i < items.length; ++i){
+                    for (let j = 0; j < items[i].length; ++j){
+                        if (items[i][j][2] === props.currency){
+                            totalCost += Number(items[i][j][1]);
+                        }
+                        else{
+                            totalCost += Number(items[i][j][1]) / Number(dataCurrency[items[i][j][2]]);
+                        }
+                    }
                 }
-
-                let incomeDates = Object.keys(parsedHistory["income"]);
-                let expenseDates = Object.keys(parsedHistory["expense"]);
-
+                return totalCost;
+            }
+            let avarage = 0;
+            if (props.numberOfMonths === 1){
 
             }
             else{
-
+                let month = new Date().getMonth();
+                let year = new Date().getFullYear();
+                for (let i = 1; i <= props.numberOfMonths; ++i){
+                    let cost = 0;
+                    for (let day = 1; day <= 31; ++day){
+                        let date = "";
+                        if (day <= 9){
+                            date += '0';
+                        }
+                        date += day;
+                        date += '.';
+                        if (month + 1 <= 9){
+                            date += '0';
+                        }
+                        date += (month + 1);
+                        date += '.';
+                        date += year;
+                        if (parsedHistory["income"][date] !== undefined){
+                            cost += getMoney(parsedHistory["income"][date].items);
+                        }
+                        if (parsedHistory["expense"][date] !== undefined){
+                            cost -= getMoney(parsedHistory["expense"][date].items);
+                        }
+                    }
+                    avarage += cost;
+                    cost = cost.toFixed(2);
+                    dataAux.datasets[0].data.push(cost);
+                    dataAux.labels.push(months[month] + " " + year);
+                    --month;
+                    if (month == -1){
+                        month += 12;
+                        --year;
+                    }
+                }
+                avarage /= props.numberOfMonths;
+                avarage = avarage.toFixed(2);
             }
-            // const history = localStorage.getItem('history');
-            // const parsedHistory = JSON.parse(history);
-            // let top = {};
-    
-            // const getData = (type, top, parsedHistory) => {
-            //     let aux = Object.keys(parsedHistory[type]);
-            //     for (let i = 0; i < aux.length; ++i){
-            //         let categories = parsedHistory[type][aux[i]]["categories"];
-            //         let items = parsedHistory[type][aux[i]]["items"];
-            //         for (let j = 0; j < categories.length; ++j){
-            //             if (top[categories[j]] === undefined){
-            //                 top[categories[j]] = 0;
-            //             }
-            //             let cost = 0;
-            //             for (let k = 0; k < items[j].length; ++k){
-            //                 if (items[j][k][2] === props.currency){
-            //                     cost += Number(items[j][k][1]);
-            //                 }
-            //                 else{
-            //                     cost += Number(items[j][k][1]) / Number(dataCurrency[items[j][k][2]]);
-            //                 }
-            //             }
-            //             top[categories[j]] += cost;
-            //         }
-            //     }
-            // }
-            // if (parsedHistory === null){
-            //     return;
-            // }
-            // getData("income", top, parsedHistory);
-            // getData("expense", top, parsedHistory);
-            // let keysOfTop = Object.keys(top);
-            // let sortedTop  = [];
-            // for (let i = 0; i < keysOfTop.length; ++i){
-            //     sortedTop.push({val: top[keysOfTop[i]], index: i});
-            // }
-            // sortedTop.sort((a, b) => b.val - a.val);
-            // let topDataAux = {...topData};
-            // topDataAux.datasets[0].data = [];
-            // topDataAux.labels = [];
-            // topDataAux.datasets[0].backgroundColor = [];
-            // for (let i = 1; i <= Math.min(keysOfTop.length, props.numberOfCategories); ++i){
-            //     topDataAux.labels.push(keysOfTop[sortedTop[i - 1].index]);
-            //     topDataAux.datasets[0].data.push((sortedTop[i - 1].val).toFixed(2));
-            //     topDataAux.datasets[0].backgroundColor.push(colors[i - 1]);
-            // }
-            // setTopData(topDataAux);
+            dataAux.datasets[0].data.reverse();
+            dataAux.labels.reverse();
+            setData(dataAux);
+            setAvarageProfit(avarage);
         }
         const changeToCurrentCurrency = async () => {
             const dataCurrency = await exchangeRatesApi(props.currency);
@@ -109,9 +117,12 @@ function LineGraph(props) {
 
     return (
         <div className="LineGraph">
-            <Line data={data} options={{
-                maintainAspectRatio : false
-            }}/>
+            <h3 style = {{textAlign: "center"}}>Avarage Profit: {avarageProfit} {props.currency}</h3>
+            <div style={{ position: "relative", margin: "auto", width: "70vw", height: "500px"}}>
+                <Line data={data} options={{
+                    maintainAspectRatio : false
+                }}/>
+            </div>
         </div>
     );
 }

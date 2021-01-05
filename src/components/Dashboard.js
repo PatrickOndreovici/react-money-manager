@@ -20,6 +20,10 @@ function Dashboard(props) {
   const categories = ["Food", "Clothes", "Social life", "Self development", "Health", "Other"];
   const [currentCategory, setCurrentCategory] = useState(-1);
 
+  useEffect(() => {
+    document.getElementsByClassName("dateInput")[0].valueAsDate = new Date();
+  }, []);
+
   useEffect(async () => {
     const changeToCurrentCurrency = async () => {
       const data = await exchangeRatesApi(totalCostCurrency);
@@ -153,8 +157,8 @@ function Dashboard(props) {
       }
       storageData[types[type]][addItems[i][2]] += Number(addItems[i][1]);
     }
-    let today = new Date();
-    today = today.toLocaleDateString();
+    let today = (document.getElementsByClassName("dateInput")[0].valueAsDate).toLocaleDateString()
+    //console.log((document.getElementsByClassName("dateInput")[0].valueAsDate).toLocaleDateString());
     if (localStorage.getItem("history") === null){
       let data = {
         income: {},
@@ -299,6 +303,7 @@ function Dashboard(props) {
 
             </div>
             <div className = "addNewItems">
+            <input type="date" className = "dateInput"></input>
                 <div style = {{display: "flex", justifyContent: "space-around"}}>
                   <input className = "nameOfItemInput" placeholder = "name of item"></input>
                   <input className = "costOfItemInput" placeholder = "cost of item"></input>
